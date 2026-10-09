@@ -1,7 +1,7 @@
 variable "allowed_cidr" {
   description = "CIDR allowed to reach SSH, Grafana and Prometheus"
   type        = string
-  default     = "0.0.0.0/0"
+  default     = "41.239.65.106/32"
 }
 
 resource "aws_security_group" "servers" {
