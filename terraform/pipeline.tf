@@ -1,6 +1,6 @@
 resource "aws_s3_bucket" "logs" {
   bucket_prefix = "dataops-project-bucket-"
-  force_destroy = true
+  force_destroy = false
 }
 
 resource "aws_s3_bucket_public_access_block" "logs" {

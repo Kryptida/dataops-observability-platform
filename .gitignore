@@ -1,21 +1,74 @@
-# Terraform local files
-.terraform/
+# ------------------------------------------------------------
+# Terraform: local state, working directories, and plans
+# ------------------------------------------------------------
+
+**/.terraform/
 *.tfstate
 *.tfstate.*
-crash.log
-tfplan
+.terraform.tfstate.lock.info
 *.tfplan
+*.plan
+tfplan
+crash.log
+crash.*.log
+
+# Terraform override files
 override.tf
 override.tf.json
-terraform.tfvars
-*.auto.tfvars
+*_override.tf
+*_override.tf.json
 
-# Keys and secrets
+# Terraform variable files may contain sensitive values
+*.tfvars
+*.tfvars.json
+*.auto.tfvars
+*.auto.tfvars.json
+
+# Keep the dependency lock file tracked:
+# .terraform.lock.hcl
+
+# ------------------------------------------------------------
+# Credentials and environment configuration
+# ------------------------------------------------------------
+
+.env
+.env.*
+!.env.example
+!.env.*.example
+*credentials*
+*.credentials
+credentials/
+secrets/
+
+# ------------------------------------------------------------
+# Private keys and sensitive key containers
+# ------------------------------------------------------------
+
 *.pem
 *.key
+*.ppk
+*.p12
+*.pfx
+*.jks
+*.keystore
 id_*
-.env
-*credentials*
+dataops-key
+dataops-key.*
+github-key
+github-key.*
 
-# Editor files
+# ------------------------------------------------------------
+# Logs and diagnostic output
+# ------------------------------------------------------------
+
+*.log
+
+# ------------------------------------------------------------
+# Editor and operating-system files
+# ------------------------------------------------------------
+
 *.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
