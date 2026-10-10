@@ -122,10 +122,6 @@ The screenshots below document the deployed infrastructure, metric collection, d
 
 ![EC2 instances running](monitoring/EC2_Instances_running.png)
 
-**Cribl Edge nodes**
-
-![Cribl Edge nodes](monitoring/Crible_Edge_Nodes.png)
-
 **IAM roles**
 
 ![IAM roles](monitoring/IAM_Roles.png)
