@@ -172,3 +172,4 @@ The screenshots below document the infrastructure, metric collection, dashboards
 ## Project status
 
 This repository documents a hands-on observability lab built with Terraform and AWS-managed streaming services. The screenshots record the state observed during testing; they are evidence of the lab at that time, not a guarantee that the resources are still running.
+The AWS environment has been torn down to avoid ongoing infrastructure charges. The Terraform configuration and screenshots are retained for portfolio purposes. Recreating the environment requires AWS credentials and a new S3 backend bucket.
