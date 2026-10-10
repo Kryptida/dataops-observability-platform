@@ -4,8 +4,6 @@ An AWS-based observability project that collects infrastructure metrics from thr
 
 ## Architecture
 
-<!-- Upload the course architecture image to monitoring/dataops-architecture.png before publishing this README. -->
-
 ![DataOps Observability Platform architecture](monitoring/dataops-architecture.png)
 
 ### Metrics pipeline
