@@ -1,6 +1,6 @@
 # DataOps Observability Platform
 
-An AWS-based observability project that collects infrastructure metrics from three Linux EC2 instances and forwards operational logs to Amazon S3. Terraform defines the infrastructure, Prometheus scrapes Node Exporter metrics, Grafana visualizes them, and Cribl Edge forwards logs through Amazon Kinesis Data Streams and Amazon Data Firehose.
+An AWS-based observability project that collects infrastructure metrics from three Linux EC2 instances and delivers operational logs to Amazon S3. Terraform defines the infrastructure, Prometheus scrapes Node Exporter metrics, Grafana visualizes them, and Cribl Edge forwards logs through Amazon Kinesis Data Streams and Amazon Data Firehose.
 
 ## Architecture
 
@@ -16,7 +16,7 @@ An AWS-based observability project that collects infrastructure metrics from thr
 
 1. Cribl Edge runs on the Linux instances and forwards logs to Amazon Kinesis Data Streams.
 2. Amazon Data Firehose reads the stream and delivers log objects to Amazon S3 using time-based prefixes.
-3. Amazon S3 stores the delivered log files.
+3. Amazon S3 provides durable storage for the delivered log files.
 
 ## Infrastructure
 
@@ -26,15 +26,16 @@ An AWS-based observability project that collects infrastructure metrics from thr
 | Worker 1 (`10.0.1.11`) | `t3.small` | Node Exporter, Cribl Edge |
 | Worker 2 (`10.0.1.12`) | `t3.small` | Node Exporter, Cribl Edge |
 
-### AWS services
+### AWS services and tools
 
 - **Amazon EC2** — hosts the monitoring server and two worker instances.
-- **Amazon VPC** — provides network connectivity between the instances and internal metrics traffic.
-- **Amazon Kinesis Data Streams** — receives the forwarded log events.
-- **Amazon Data Firehose** — delivers records from Kinesis to S3.
+- **Amazon VPC** — provides the network for the instances and internal metrics traffic.
+- **Amazon Kinesis Data Streams** — receives forwarded log events.
+- **Amazon Data Firehose** — delivers records from Kinesis Data Streams to S3.
 - **Amazon S3** — stores delivered log objects.
 - **AWS IAM** — grants the EC2 and Firehose components the permissions they need.
 - **Terraform** — defines and manages the infrastructure as code.
+- **Prometheus, Grafana, Node Exporter, and Cribl Edge** — provide metrics collection, visualization, and log forwarding.
 
 ## Metrics and dashboards
 
@@ -46,11 +47,7 @@ Node Exporter exposes host-level metrics, including CPU, memory, disk and filesy
 | Worker 1 | `10.0.1.11:9100` | Worker 1 host metrics |
 | Worker 2 | `10.0.1.12:9100` | Worker 2 host metrics |
 
-The targets were observed as **UP** in Prometheus during project validation. From a host with network access to a target, Node Exporter metrics can be checked at `http://<instance-private-ip>:9100/metrics`. For example, on a host running Node Exporter locally:
-
-```bash
-curl http://localhost:9100/metrics
-```
+The targets were observed as **UP** in Prometheus during project validation. From a host with network access to a target, Node Exporter metrics can be checked at `http://<instance-private-ip>:9100/metrics` (for example, locally with `curl http://localhost:9100/metrics`).
 
 | Component | Port | Intended access |
 |---|---:|---|
@@ -61,11 +58,11 @@ curl http://localhost:9100/metrics
 
 ## Log delivery
 
-The log path is:
+The log pipeline is:
 
 `Linux instances → Cribl Edge → Kinesis Data Streams → Amazon Data Firehose → Amazon S3`
 
-Firehose writes log objects with time-based prefixes, making delivered data easier to browse by date and hour. The S3 bucket is configured with server-side encryption, S3 Block Public Access, and a bucket-policy control that denies insecure transport for applicable requests.
+Firehose writes log objects with time-based prefixes, making delivered data easier to browse by date and hour. The S3 destination is configured with server-side encryption, S3 Block Public Access, and a bucket-policy control that denies insecure transport for applicable requests.
 
 ## Terraform layout
 
@@ -83,7 +80,7 @@ Terraform state is configured to use an S3 backend with lock-file-based state lo
 
 ### Run Terraform
 
-From the repository root, configure AWS credentials and review the input variables for your own environment before running:
+Run these commands from the Terraform directory after configuring AWS credentials and reviewing the input variables for your own environment:
 
 ```bash
 cd terraform
@@ -99,11 +96,11 @@ Review the plan carefully before applying changes:
 terraform apply
 ```
 
-The example `allowed_cidr` value is documentation-only. Set the appropriate administrator public IP/CIDR in your local, untracked `terraform.tfvars` to control access to SSH, Grafana, and Prometheus. Do not commit that real configuration file.
+The example `allowed_cidr` value is documentation-only. Replace it in your local, untracked `terraform.tfvars` with the public IP/CIDR that should be allowed to reach SSH, Grafana, and Prometheus. Do not commit that real configuration file.
 
 ### Cost and cleanup
 
-These resources can incur AWS charges while running. Stop or remove lab resources when you no longer need them, and check the AWS console for resources left behind. Before destroying the infrastructure, retain any logs you need and empty the S3 bucket intentionally if you want Terraform to delete it: the bucket uses `force_destroy = false`, so a non-empty bucket can prevent deletion.
+These resources can incur AWS charges while running. Stop or remove lab resources when you no longer need them, and check the AWS console for resources left behind. Before destroying the infrastructure, retain any logs you need and empty the S3 destination bucket intentionally if you want Terraform to delete it: the bucket uses `force_destroy = false`, so a non-empty bucket can prevent deletion.
 
 ## Security choices
 
@@ -116,7 +113,7 @@ These resources can incur AWS charges while running. Stop or remove lab resource
 
 ## Screenshots
 
-These screenshots document the deployed infrastructure, metrics collection, dashboards, and log delivery. Instance addresses and resource names can change when the lab is recreated.
+The screenshots below document the infrastructure, metric collection, dashboards, and log delivery observed during testing. Instance addresses and resource names can change when the lab is recreated.
 
 ### Infrastructure
 
@@ -162,15 +159,15 @@ These screenshots document the deployed infrastructure, metrics collection, dash
 
 **Kinesis Data Streams**
 
-![Kinesis stream](monitoring/Kinesis.png)
+![Kinesis Data Streams](monitoring/Kinesis.png)
 
 **Firehose delivery status and source time**
 
-![Firehose stream source time and status](monitoring/Firehose_Stream_Source_Time_Status.png)
+![Firehose delivery status and source time](monitoring/Firehose_Stream_Source_Time_Status.png)
 
 **Delivered objects in S3**
 
-![S3 bucket logs](monitoring/S3_Bucket_Logs.png)
+![S3 bucket log objects](monitoring/S3_Bucket_Logs.png)
 
 ## Project status
 
